@@ -206,7 +206,7 @@ def main():
             param_group['lr'] = LEARNING_RATE
         start = checkpoint_data['epoch']
 
-    for i in tqdm.tqdm(range(start,NUM_BATCHES), mininterval = 10., desc = 'training'):
+    for i in tqdm.tqdm(range(start,NUM_BATCHES), mininterval = 10., desc = 'training', file=sys.stdout):
         model.train()
         total_loss = 0
         for __ in range(GRADIENT_ACCUMULATE_EVERY):

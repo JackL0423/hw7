@@ -141,7 +141,7 @@ def compute_perplexity_huggingface(model,test_set,device,max_len=SEQ_LENGTH):
             best_found = True
             # save the best model
 
-    tqdm.tqdm.write("-----------Perplexity------------- = ", ppl, "----loss=",torch.stack(nlls).mean(), file=sys.stdout)
+    tqdm.tqdm.write(f"-----------Perplexity------------- = {ppl.item()} ----loss= {torch.stack(nlls).mean().item()}", file=sys.stdout)
     return best_found
 
 def save_model(model, i, optim, fname):
@@ -182,7 +182,7 @@ def main():
     model = AutoRegressiveWrapper(longshort_model, latent_len=LATENT_LEN)
     model.cuda()
     pcount = count_parameters(model)
-    tqdm.tqdm.write("count of parameters in the model = " + str(pcount/1e6) + " million", file=sys.stdout)
+    tqdm.tqdm.write(f"count of parameters in the model = {(pcount/1e6)} million", file=sys.stdout)
 
     if DO_WORD_LEVEL_MODELING == True:
         train_loader, val_loader, test_loader, val_dataset, test_dataset = Utils.get_loaders_wikitext_103(tokenizer_word, SEQ_LENGTH, BATCH_SIZE)
@@ -222,7 +222,7 @@ def main():
         if (i% VALIDATE_EVERY == 0) and (DO_WORD_LEVEL_MODELING == True):
             ret = compute_perplexity_huggingface(model,test_dataset,'cuda')
             if ret == True: # save best model
-                print('-------------saving best model------------')
+                tqdm.tqdm.write('-------------saving best model------------', file=sys.stdout)
                 save_model(model,i,optim,"transAM_2048_base_PAR_model_best.pt") # save best model
 
         if ((i+0) % VALIDATE_EVERY == 0) and (DO_WORD_LEVEL_MODELING == False):

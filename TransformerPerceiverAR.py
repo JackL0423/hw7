@@ -141,12 +141,12 @@ def compute_perplexity_huggingface(model,test_set,device,max_len=SEQ_LENGTH):
             best_found = True
             # save the best model
 
-    print("-----------Perplexity------------- = ", ppl, "----loss=",torch.stack(nlls).mean())
+    tqdm.tqdm.write("-----------Perplexity------------- = ", ppl, "----loss=",torch.stack(nlls).mean(), file=sys.stdout)
     return best_found
 
 def save_model(model, i, optim, fname):
     # ---------save the latest model---------
-    print("----------saving model-----------------")
+    tqdm.tqdm.write("----------saving model-----------------", file=sys.stdout)
     checkpoint_data = {
     'epoch': i,
     'state_dict': model.state_dict(),
@@ -182,7 +182,7 @@ def main():
     model = AutoRegressiveWrapper(longshort_model, latent_len=LATENT_LEN)
     model.cuda()
     pcount = count_parameters(model)
-    print("count of parameters in the model = ", pcount/1e6, " million")
+    tqdm.tqdm.write("count of parameters in the model = " + str(pcount/1e6) + " million", file=sys.stdout)
 
     if DO_WORD_LEVEL_MODELING == True:
         train_loader, val_loader, test_loader, val_dataset, test_dataset = Utils.get_loaders_wikitext_103(tokenizer_word, SEQ_LENGTH, BATCH_SIZE)
@@ -213,7 +213,7 @@ def main():
             loss = model(next(train_loader))
             loss.backward()
         if (i%100 == 0):
-            print(f'training loss: {loss.item()} -- iteration = {i}')
+            tqdm.tqdm.write(f'training loss: {loss.item()} -- iteration = {i}', file=sys.stdout)
 
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optim.step()
@@ -238,10 +238,10 @@ def main():
                    loss_m = loss.mean()
                    total_loss2 += SEQ_LENGTH * loss_m.item() #loss.float().item() #seq_len
                    total_len2 += SEQ_LENGTH
-               print(f'----------validation loss: {total_loss/val_count}')
-               print(f'Perplexity : {math.exp(total_loss/val_count)}, BPC: {total_loss/val_count*np.log2(2.7173)}')
+               tqdm.tqdm.write(f'----------validation loss: {total_loss/val_count}', file=sys.stdout)
+               tqdm.tqdm.write(f'Perplexity : {math.exp(total_loss/val_count)}, BPC: {total_loss/val_count*np.log2(2.7173)}', file=sys.stdout)
                bpc2 = (total_loss2/total_len2)/math.log(2)
-               print("BPC 2 = ", bpc2)
+               tqdm.tqdm.write("BPC 2 = " + str(bpc2), file=sys.stdout)
                total_loss = 0
 
         if (i+1) % GENERATE_EVERY == 0:  
@@ -251,17 +251,17 @@ def main():
                input_start_sequence = decode_tokens_word(inp)
            else:
                input_start_sequence = decode_tokens_char(inp)
-           print("----------start input------------------")
-           print(f'%s \n\n', (input_start_sequence))
-           print("----------end of start input-----------")
+           tqdm.tqdm.write("----------start input------------------", file=sys.stdout)
+           tqdm.tqdm.write(f'%s \n\n', (input_start_sequence), file=sys.stdout)
+           tqdm.tqdm.write("----------end of start input-----------", file=sys.stdout)
            sample = model.generate(inp, GENERATE_LENGTH)
            if DO_WORD_LEVEL_MODELING == True:
                output_str = decode_tokens_word(sample)
            else:
                output_str = decode_tokens_char(sample)
-           print("----------generated output-------------")
-           print(output_str)
-           print("----------end generated output---------")
+           tqdm.tqdm.write("----------generated output-------------", file=sys.stdout)
+           tqdm.tqdm.write(output_str, file=sys.stdout)
+           tqdm.tqdm.write("----------end generated output---------", file=sys.stdout)
         if i % 1000 == 0:  #0 
            save_model(model,i,optim,"transAM_WK_model.pt")
            model.train()

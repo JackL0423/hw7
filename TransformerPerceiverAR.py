@@ -252,7 +252,7 @@ def main():
            else:
                input_start_sequence = decode_tokens_char(inp)
            tqdm.tqdm.write("----------start input------------------", file=sys.stdout)
-           tqdm.tqdm.write(f'%s \n\n', (input_start_sequence), file=sys.stdout)
+           tqdm.tqdm.write(f'{input_start_sequence}\n\n', file=sys.stdout)
            tqdm.tqdm.write("----------end of start input-----------", file=sys.stdout)
            sample = model.generate(inp, GENERATE_LENGTH)
            if DO_WORD_LEVEL_MODELING == True:

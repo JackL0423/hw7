@@ -24,7 +24,7 @@ VALIDATE_EVERY  = 10000
 GENERATE_EVERY  = 10000
 GENERATE_LENGTH = 256
 SEQ_LENGTH = 1024 # was 1024
-RESUME_TRAINING = False # set to false to start training from beginning
+RESUME_TRAINING = True # set to false to start training from beginning
 LAST_BEST_PERPLEXITY = 999#21.76  
 
 EMBEDDING_SIZE = 512
